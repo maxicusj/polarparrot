@@ -1,7 +1,7 @@
 
 # **Analytics Calculation Engine**
 
-This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars DataFrames.
+This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars.
 
 ---
 
