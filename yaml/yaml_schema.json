@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["metric_name", "required_data", "task"],
+  "properties": {
+    "metric_name": {
+      "type": "string",
+      "description": "The name of the metric being calculated."
+    },
+    "required_data": {
+      "type": "array",
+      "description": "List of additional data tables needed for processing.",
+      "items": {
+        "type": "object",
+        "required": ["table", "columns", "join_on"],
+        "properties": {
+          "table": {
+            "type": "string",
+            "description": "The name of the required table."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Columns to fetch from the table.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "join_on": {
+            "type": "string",
+            "description": "The column used to join this table with the positions."
+          }
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["description", "steps"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description of the task being performed."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Steps to perform the calculation.",
+          "items": {
+            "type": "object",
+            "required": ["step", "action"],
+            "properties": {
+              "step": {
+                "type": "string",
+                "description": "The name or description of the step."
+              },
+              "action": {
+                "type": "string",
+                "description": "A detailed explanation of what the step does."
+              },
+              "python": {
+                "type": "string",
+                "description": "Python code to execute for this step.",
+                "minLength": 1
+              },
+              "polars": {
+                "type": "string",
+                "description": "Polars code to execute for this step.",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}

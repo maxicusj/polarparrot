@@ -1,0 +1,46 @@
+metric_name: "Id: 0002, Sum of Weights, grouped by credit_parent_name"
+required_data:
+  - table: instrument_categorization
+    columns: ["credit_parent_name","instrument_id"]
+    join_on: "instrument_id"
+task:
+  description: >
+    Process the positions and instrument_categorization data to obtain a list of positions where is_laggard is True, weights are adjusted based on a threshold, and data is grouped by credit_parent_name with total sums of weights.
+  steps:
+    - step: Filter positions where is_laggard is True and apply weight threshold
+      action: >
+        Filter positions where is_laggard is True and set weights below or equal to 0.00006 to zero.
+      polars: |
+        threshold = 0.00006
+        # Filter positions where is_laggard is True
+        positions_laggard = positions_pl.filter(pl.col('is_laggard') == True)
+        # Apply threshold to weight columns
+        positions_laggard = positions_laggard.with_columns([
+            pl.when(pl.col(f'weight_{i}') > threshold)
+              .then(pl.col(f'weight_{i}'))
+              .otherwise(0)
+              .alias(f'weight_{i}') for i in range(1, 5)
+        ])
+    - step: Join positions with instrument_categorization
+      action: Join the filtered positions with instrument_categorization on instrument_id.
+      polars: |
+        # Join with instrument_categorization on instrument_id
+        positions_with_ic = positions_laggard.join(
+            instrument_categorization_pl,
+            on='instrument_id',
+            how='inner'
+        )
+    - step: Group by credit_parent_name and aggregate weights
+      action: Group the data by credit_parent_name and aggregate weight columns with sums.
+      polars: |
+        # Group by credit_parent_name and aggregate weights
+        grouped_positions = positions_with_ic.group_by('credit_parent_name').agg([
+            pl.sum(f'weight_{i}').alias(f'weight_{i}') for i in range(1, 5)
+        ] + [
+            pl.count('instrument_id').alias('position_count')
+        ])
+        # Rename 'credit_parent_name' to 'category'
+        result = grouped_positions.rename({'credit_parent_name': 'category'})
+        # Optional: Sort by category
+        result = result.sort('category')
+

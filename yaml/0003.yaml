@@ -1,0 +1,40 @@
+metric_name: "Id: 0003, Top 5 Positions by Currency"
+required_data:
+  - table: instrument_categorization
+    columns: ["currency", "instrument_id"]
+    join_on: "instrument_id"
+task:
+  description: >
+    Process the positions and instrument_categorization data to obtain the top 5 positions grouped by currency, sorted by currency in ascending order, and aggregated to match the target schema.
+  steps:
+    - step: Join positions with instrument_categorization
+      action: Join the filtered positions with instrument_categorization on instrument_id.
+      polars: |
+        # Join with instrument_categorization on instrument_id
+        positions_with_currency = positions_pl.join(
+            instrument_categorization_pl,
+            on='instrument_id',
+            how='inner'
+        )
+    - step: Group by currency and aggregate weights
+      action: >
+        Group the data by currency, calculate total weight columns, and count the number of positions.
+      polars: |
+        # Group by currency and aggregate weights
+        grouped_positions = positions_with_currency.group_by('currency').agg([
+            pl.sum(f'weight_{i}').alias(f'weight_{i}') for i in range(1, 5)
+        ] + [
+            pl.count('instrument_id').alias('position_count')
+        ])
+    - step: Sort by currency and select top 5
+      action: Sort the grouped data by currency in ascending order and select the top 5.
+      polars: |
+        # Sort by currency and select top 5
+        grouped_positions = grouped_positions.sort('currency').head(5)
+    - step: Rename and finalize schema
+      action: Rename the 'currency' column to 'category' and finalize the schema for the result.
+      polars: |
+        # Rename 'currency' to 'category'
+        result = grouped_positions.rename({'currency': 'category'})
+        # Optional: Sort by category for final presentation
+        result = result.sort('category')

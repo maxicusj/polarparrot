@@ -1,0 +1,55 @@
+# calculation_average.yaml
+metric_name: "Id: 00010, Average of Weights, grouped by sector1"
+required_data:
+  - table: instrument_categorization
+    columns: ["sector1","credit_parent_name","instrument_id"]
+    join_on: "instrument_id"
+task:
+  description: >
+    Calculate the average weights of positions where is_laggard is True, grouped by credit_parent_name.
+  steps:
+    - step: Convert Pandas DataFrames to Polars DataFrames
+      action: Use Polars library to convert the input Pandas DataFrames.
+      python: |
+          # Convert Pandas DataFrames to Polars DataFrames
+          print('Doing some python code')
+          # positions_pl = pl.from_pandas(positions_df)
+          # instrument_categorization_pl = pl.from_pandas(instrument_categorization_df)
+    - step: Filter positions where is_laggard is True and apply weight threshold
+      action: >
+        Filter positions where is_laggard is True and set weights below or equal to 0.00006 to zero.
+      polars: |
+        threshold = 0.00006
+        # Filter positions where is_laggard is True
+        positions_laggard = positions_pl.filter(pl.col('is_laggard') == True)
+        # Apply threshold to weight columns
+        positions_laggard = positions_laggard.with_columns([
+            pl.when(pl.col(f'weight_{i}') > threshold)
+              .then(pl.col(f'weight_{i}'))
+              .otherwise(0)
+              .alias(f'weight_{i}') for i in range(1, 5)
+        ])
+    - step: Join positions with instrument_categorization
+      action: Join the filtered positions with instrument_categorization on instrument_id.
+      polars: |
+        # Join with instrument_categorization on instrument_id
+        positions_with_credit_parent = positions_laggard.join(
+            instrument_categorization_pl,
+            on='instrument_id',
+            how='inner'
+        )
+    - step: Group by sector1 and calculate average weights
+      action: Group the data by sector1 and calculate average weight columns.
+      polars: |
+        # Group by sector1 and calculate averages
+        grouped_positions = positions_with_credit_parent.group_by('sector1').agg([
+            pl.mean(f'weight_{i}').alias(f'weight_{i}') for i in range(1, 5)
+        ] + [
+            pl.count('instrument_id').alias('position_count')
+        ])
+        # Rename 'sector1' to 'category'
+        result = grouped_positions.rename({'sector1': 'category'})
+        # Optional: Sort by category
+        result = result.sort('category')
+
+
