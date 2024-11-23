@@ -32,16 +32,21 @@
 
 from flask import Flask, request, jsonify
 import pyodbc
-import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
+load_dotenv()
+
 # Set up SQL Server connection
 def get_sql_server_connection():
-    server = 'localhost'
-    database = 'AdventureWorks'
-    username = 'sa'
-    password = 'Romka777.'
+    server = os.getenv("DB_SERVER")
+    database = os.getenv("DB_DATABASE")
+    username = os.getenv("DB_USERNAME")
+    password = os.getenv("DB_PASSWORD")
     
     try:
         conn = pyodbc.connect(
