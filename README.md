@@ -2,28 +2,6 @@
 
 This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars. It also hosts a dash app that enables LLM model to create YAML schema comliant yaml files that can be consumed and interpreted by the calculation engine. 
 
-
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Ni_uL8xlDas/0.jpg)](https://www.youtube.com/watch?v=Ni_uL8xlDas))
-
-
-
-
-```mermaid
-graph TD
-    A[User] -->|Interacts with| B[Dash Web UI]
-    B -->|Sends JSON data| C[Backend Service]
-    C -->|Fetches data from| G[Data Service]
-    G -->|Fetches data from| D[SQL Server]
-    C -->|Processes YAML files with| E[Calculation Engine]
-    E -->|Uses| F[Polars]
-    C -->|Interacts with| H[GPT App]
-    H -->|Generates| I[YAML Files]
-    C -->|Returns results to| B
-    B -->|Displays results to| A
-```
-
-
 ---
 
 ## **Table of Contents**
@@ -46,6 +24,31 @@ graph TD
 ## **Overview**
 
 The analytics calculation engine is designed to process data based on instructions provided in YAML configuration files. It leverages **Polars** for data manipulation and supports **Sphinx** for documentation generation.
+
+
+### **System Context**
+
+```mermaid
+graph TD
+    A[User] -->|Interacts with| B[Dash Web UI]
+    B -->|Sends JSON data| C[Backend Service]
+    C -->|Fetches data from| G[Data Service]
+    G -->|Fetches data from| D[SQL Server]
+    C -->|Processes YAML files with| E[Calculation Engine]
+    E -->|Uses| F[Polars]
+    C -->|Interacts with| H[GPT App]
+    H -->|Generates| I[YAML Files]
+    C -->|Returns results to| B
+    B -->|Displays results to| A
+```
+
+### **Video Demo**
+<p style="text-align: center;">
+  <a href="https://www.youtube.com/watch?v=Ni_uL8xlDas">
+    <img src="https://img.youtube.com/vi/Ni_uL8xlDas/0.jpg" alt="IMAGE ALT TEXT HERE" />
+  </a>
+</p>
+
 
 ---
 
