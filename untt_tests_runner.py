@@ -5,6 +5,7 @@ import polars as pl
 import textwrap
 import yaml
 from calculation_engine import CalculationEngine
+from polars.testing import assert_frame_equal
 
 
 class TestCalculationEngine(unittest.TestCase):
@@ -22,6 +23,9 @@ task:
         total = df["a"].sum()
     - step: "Include Steps"
       include: "included_steps.yaml"
+    - step: "Polars Operation"
+      polars: |
+        df = df.with_columns((df["a"] + df["b"]).alias("c"))
 ''')
         self.temp_yaml_file.write(yaml_content.encode('utf-8'))
         self.temp_yaml_file.close()
@@ -69,6 +73,11 @@ task:
         self.assertIn('product', exec_namespace)
         expected_product = pl.Series([4, 10, 18])
         self.assertTrue((exec_namespace['product'] == expected_product).all())
+
+        # Check if 'c' column is added correctly in Polars operation
+        self.assertIn('df', exec_namespace)
+        expected_df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [5, 7, 9]})
+        assert_frame_equal(exec_namespace['df'], expected_df)
 
 if __name__ == '__main__':
     unittest.main()
