@@ -22,7 +22,7 @@ setup(
         "License :: OSI Approved :: MIT License",  # Replace with your license
         "Operating System :: OS Independent",
     ],
-    packages=find_packages(include=["polarparrot", "polarparrot.*","*"]),
+    packages=find_packages(include=["polarparrot", "polarparrot.*"]),
     python_requires=">=3.11",  # Minimum Python version required
     install_requires=[
         "pyodbc>=5.2.0",  # Add your dependencies here (e.g., 'requests>=2.25.1')

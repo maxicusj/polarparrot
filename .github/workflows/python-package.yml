@@ -32,12 +32,12 @@ jobs:
       # Step 4: Run regression tests
       - name: Run Regression Tests
         run: |
-          python tests/regression_runner.py
+          python polarparrot/tests/regression_runner.py
 
       # Step 5: Run unit tests
       - name: Run Unit Tests
         run: |
-          python tests/unit_tests_runner.py
+          python polarparrot/tests/unit_tests_runner.py
 
       # # Step 6: add tag
       # - name: Get the current tag
