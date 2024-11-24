@@ -1,7 +1,16 @@
-
 # **Analytics Calculation Engine**
 
 This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars.
+
+graph TD
+    A[User] -->|Interacts with| B[Dash Web UI]
+    B -->|Sends JSON data| C[Backend Service]
+    C -->|Fetches data from| G[Data Service]
+    G -->|Fetches data from| D[SQL Server]
+    C -->|Processes YAML files with| E[Calculation Engine]
+    E -->|Uses| F[Polars]
+    C -->|Returns results to| B
+    B -->|Displays results to| A
 
 ---
 
@@ -127,4 +136,4 @@ You can customize this engine by:
 
 This project is licensed under [MIT License](LICENSE).
 
---- 
+---
