@@ -1,6 +1,9 @@
 # **Analytics Calculation Engine**
 
-This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars.
+This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars. It also hosts a dash app that enables LLM model to create YAML schema comliant yaml files that can be consumed and interpreted by the calculation engine. 
+
+<iframe width="560" height="315" src="https://youtu.be/Ni_uL8xlDas" frameborder="0" allowfullscreen></iframe>
+
 
 ```mermaid
 graph TD
