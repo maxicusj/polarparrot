@@ -2,10 +2,6 @@
 
 This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars.
 
-# Data Flow System
-
-The diagram below illustrates the data flow system using a Mermaid graph:
-
 ```mermaid
 graph TD
     A[User] -->|Interacts with| B[Dash Web UI]
@@ -16,7 +12,7 @@ graph TD
     E -->|Uses| F[Polars]
     C -->|Returns results to| B
     B -->|Displays results to| A
-
+```
 
 
 ---
