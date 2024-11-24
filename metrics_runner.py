@@ -9,6 +9,7 @@ import json
 import sys
 import polars as pl
 import io
+import yaml
 from data.data import get_positions_data, get_instrument_categorization_data
 from calculation_engine import CalculationEngine
 
