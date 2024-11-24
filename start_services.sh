@@ -7,7 +7,7 @@ FLASK_DS_PID=$!
 
 # Start the Flask backend service
 echo "Starting Flask backend service..."
-python backend_serice.py &
+python backend_service.py &
 FLASK_PID=$!
 
 # Start the Dash app
