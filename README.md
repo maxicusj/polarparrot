@@ -152,6 +152,7 @@ python unit_tests_runner.py
 
 - **`metrics_runner.py`**: Executes analytics calculations as per YAML configurations.
 - **`regression_runner.py`**: Validates metrics using regression tests.
+- **`unit_tests_runner.py`**: Validates metrics using regression tests.
 - **`start_services.sh`**: Starts backend services and the web UI.
 - **`requirements.txt`**: Lists required Python packages.
 - **`.env`**: Environment variables for database connection.
@@ -162,7 +163,8 @@ python unit_tests_runner.py
 
 You can customize this engine by:
 - Adding new YAML files to the `yaml/` directory to define analytics configurations.
-- Extending the Polars DataFrame manipulation logic in the `metrics_runner.py` file.
+- Generating new YAML files by talking to a locally available LLM model(http://localhost:8080) and placing the genrated files to the `yaml/` directory to be interrpreted by the engine.
+- Extending the Polars DataFrame manipulation logic in the `calculaton_engine.py` file.
 
 ---
 
