@@ -68,7 +68,7 @@ graph TD
 
 - SQL Server database (e.g., SQL Server Docker container) to simulate database access. One can use docker image, e.g. https://github.com/chriseaton/docker-adventureworks, https://hub.docker.com/r/chriseaton/adventureworks
 - Python 3.11 or higher.
-- For GPT app to work local installation of ollama with some LLM models is needed. See https://ollama.com
+- For GPT app to work, local installation of ollama with some LLM models is needed. See https://ollama.com
 - Packages listed in `requirements.txt`.
 
 ---
