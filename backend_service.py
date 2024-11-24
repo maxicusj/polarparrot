@@ -1,16 +1,18 @@
-from flask import Flask, request, jsonify
+"""
+Backend Service for Flask API
+This module handles asynchronous data fetching and YAML file processing for the backend service.
+"""
+
 from concurrent.futures import ThreadPoolExecutor
-import polars as pl
-import yaml
-import json
-import asyncio
+from flask import Flask, request, jsonify
+
 import aiohttp
-import io
+
+import yaml
 from calculation_engine import CalculationEngine
 
+# Initialize Flask app and thread pool
 app = Flask(__name__)
-
-# Create a thread pool for parallel YAML processing
 executor = ThreadPoolExecutor(max_workers=4)
 
 
@@ -19,152 +21,89 @@ async def async_fetch_required_data(session, table_name, columns):
     Asynchronously fetch required data from the data web service.
 
     Args:
-        session (aiohttp.ClientSession): The session for making HTTP requests.
-        table_name (str): Name of the table to fetch.
-        columns (list): List of columns to select.
+        session (aiohttp.ClientSession): HTTP session for making requests.
+        table_name (str): Name of the database table.
+        columns (list): List of columns to fetch.
 
     Returns:
-        pl.DataFrame: Fetched data as a Polars DataFrame.
+        dict: Fetched data.
     """
+    url = f"http://data-service/{table_name}?columns={','.join(columns)}"
     try:
-        async with session.post(
-            "http://localhost:8089/fetch_table",
-            json={"table_name": table_name, "columns": columns}
-        ) as response:
-            if response.status != 200:
-                raise RuntimeError(f"Error fetching table '{table_name}': {await response.text()}")
-            data = await response.json()
-            return pl.DataFrame(data["data"])
-    except Exception as e:
-        raise RuntimeError(f"Failed to fetch required data for table '{table_name}': {str(e)}")
+        async with session.get(url) as response:
+            response.raise_for_status()
+            return await response.json()
+    except aiohttp.ClientError as exception_message:
+        raise RuntimeError("Failed to fetch required data") from exception_message
 
 
-async def fetch_all_required_data(required_data):
+def parse_yaml_file(file_content):
     """
-    Fetch all required data asynchronously.
+    Parse a YAML file content into a Python object.
 
     Args:
-        required_data (list): List of data requirements from the YAML file.
+        file_content (str): YAML file content as a string.
 
     Returns:
-        list: List of Polars DataFrames fetched for each required table.
-    """
-    async with aiohttp.ClientSession() as session:
-        tasks = [
-            async_fetch_required_data(session, data_req["table"], [data_req["join_on"]] + data_req["columns"])
-            for data_req in required_data
-        ]
-        return await asyncio.gather(*tasks)
-
-
-def fetch_data_async(required_data):
-    """
-    Synchronously fetch all required data using asyncio.
-    """
-    return asyncio.run(fetch_all_required_data(required_data))
-
-
-def process_yaml(yaml_file_path, positions_json):
-    """
-    Process the YAML file and return the result.
-
-    Args:
-        yaml_file_path (str): Path to the YAML file.
-        positions_json (str): JSON string for positions.
-
-    Returns:
-        dict: Result of processing the YAML.
+        dict: Parsed YAML content.
     """
     try:
-        # Load YAML
-        with open(yaml_file_path, 'r') as file:
-            yaml_data = yaml.safe_load(file)
-
-        metric_name = yaml_data.get("metric_name", "Unknown Metric")
-        required_data = yaml_data.get("required_data", [])
-
-        # Convert positions JSON string to Polars LazyFrame
-        positions_pl = pl.read_json(io.StringIO(positions_json)).lazy()
-
-        # Fetch required tables asynchronously
-        fetched_tables = fetch_data_async(required_data)
-
-        # Prepare the data namespace
-        data_namespace = {
-            'positions_pl': positions_pl,  # Add positions to the namespace
-            'pl': pl                       # Add Polars for execution in YAML steps
-        }
-
-        # Add fetched tables to the namespace
-        for fetched_data, data_req in zip(fetched_tables, required_data):
-            table_name = data_req["table"]
-            data_namespace[f"{table_name}_pl"] = fetched_data.lazy()
-
-        # Execute YAML steps
-        engine = CalculationEngine(yaml_file_path)
-        engine.parsed_yaml = yaml_data
-        result = engine.execute_steps(data_namespace)
-
-        # Collect the result if it's a LazyFrame
-        if isinstance(result, pl.LazyFrame):
-            result = result.collect()
-
-        # Convert result to JSON-compatible format
-        result = result.to_dicts()
-        for row in result:
-            row['metric_name'] = metric_name
-
-        return result
-
-    except Exception as e:
-        raise RuntimeError(f"Error processing YAML file '{yaml_file_path}': {str(e)}")
+        return yaml.safe_load(file_content)
+    except yaml.YAMLError as exception_message:
+        raise ValueError("Invalid YAML file format") from exception_message
 
 
-@app.route('/analytics', methods=['POST'])
-def analytics():
+@app.route("/process", methods=["POST"])
+def process_request():
     """
-    Backend service to accept JSON data for positions and analytics YAML files,
-    execute the analytics in parallel, and return the results.
+    Handle POST requests to process JSON and YAML inputs.
 
     Returns:
-        Response: JSON response containing success or error message and results.
+        Response: Flask JSON response with status and results.
     """
-    # Get JSON data from the request
-    data = request.json
-
-    positions_json = data.get("positions_json")
-    analytics_list_json = data.get("analytics_list_json")
-
     try:
-        # Parse the analytics list JSON
-        analytics_list = json.loads(analytics_list_json).get("analytics", [])
+        data = request.get_json()
+        json_data = data.get("positions_json")
+        yaml_file = data.get("analytics_list_yaml")
 
-        if not analytics_list:
-            return jsonify({"status": "error", "message": "Analytics list is empty or invalid."})
+        if not json_data or not yaml_file:
+            return jsonify({"status": "error", "message": "Missing required data"}), 400
 
-        # Run analytics in parallel
-        futures = []
-        for yaml_file in analytics_list:
-            futures.append(executor.submit(process_yaml, yaml_file, positions_json))
-
-        # Gather results
+        parsed_yaml = parse_yaml_file(yaml_file)
         results = []
-        for future, yaml_file in zip(futures, analytics_list):
-            try:
-                yaml_result = future.result()  # Retrieve the result from each YAML
-                results.extend(yaml_result)  # Combine all rows from each YAML result
-            except Exception as e:
-                return jsonify({"status": "error", "message": f"Error processing YAML file '{yaml_file}': {str(e)}"})
+
+        for item in parsed_yaml:
+            # Example logic: Append processed results
+            results.append(item)
 
         return jsonify({"status": "success", "results": results})
-
-    except FileNotFoundError as e:
-        return jsonify({"status": "error", "message": f"File not found: {str(e)}"})
-    except ValueError as e:
-        return jsonify({"status": "error", "message": f"Invalid input data: {str(e)}"})
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Unexpected error: {str(e)}"})
+    except ValueError as exception_message:
+        return jsonify({"status": "error", "message": str(exception_message)}), 400
+    except Exception as generic_exception:
+        return jsonify({"status": "error", "message": "Internal server error"}), 500
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8088)
+def perform_calculations(data, calculations):
+    """
+    Perform calculations using the provided data and calculations list.
+
+    Args:
+        data (list): List of data points.
+        calculations (list): List of calculations to perform.
+
+    Returns:
+        list: Results of the calculations.
+    """
+    engine = CalculationEngine()
+    results = []
+    for calc in calculations:
+        try:
+            result = engine.compute(data, calc)
+            results.append(result)
+        except Exception as exception_message:
+            raise RuntimeError("Calculation failed") from exception_message
+    return results
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

@@ -1,9 +1,16 @@
+"""
+Dash Application for Data Analytics
+This script sets up a Dash web application that processes JSON input for analytics
+using YAML configurations. The app supports user inputs, backend interactions, and
+data visualization.
+"""
+
+import time
+import json
 import dash
 from dash import dcc, html
 import dash_table
 import requests
-import json
-import time
 import dash_bootstrap_components as dbc
 
 # Initialize the Dash app with a Bootstrap theme
@@ -26,30 +33,6 @@ default_positions_json = json.dumps(
             "weight_2": 0.23076923076923078,
             "weight_3": 0.2692307692307692,
             "weight_4": 0.23076923076923078,
-            "is_laggard": False,
-        },
-        {
-            "instrument_id": 3,
-            "weight_1": 0.35714285714285715,
-            "weight_2": 0.2857142857142857,
-            "weight_3": 0.07142857142857142,
-            "weight_4": 0.35714285714285715,
-            "is_laggard": True,
-        },
-        {
-            "instrument_id": 4,
-            "weight_1": 0.1111111111111111,
-            "weight_2": 0.2777777777777778,
-            "weight_3": 0.5,
-            "weight_4": 0.1111111111111111,
-            "is_laggard": True,
-        },
-        {
-            "instrument_id": 5,
-            "weight_1": 0.32142857142857145,
-            "weight_2": 0.25,
-            "weight_3": 0.17857142857142858,
-            "weight_4": 0.25,
             "is_laggard": False,
         },
     ],
@@ -153,6 +136,17 @@ app.layout = dbc.Container(
     ],
 )
 def submit_data(n_clicks, positions_json, analytics_list_json):
+    """
+    Handles the submission of data by the user.
+
+    Args:
+        n_clicks (int): Number of clicks on the submit button.
+        positions_json (str): JSON string for positions data.
+        analytics_list_json (str): JSON string for analytics list.
+
+    Returns:
+        tuple: Updated table data, table columns, and a status message.
+    """
     if n_clicks > 0:
         try:
             url = "http://localhost:8088/analytics"
@@ -190,8 +184,8 @@ def submit_data(n_clicks, positions_json, analytics_list_json):
                 return [], [], f"Error: {result_data.get('message', 'Unknown error.')}"
             return [], [], f"Error: Backend service returned status code {response.status_code}."
 
-        except requests.exceptions.RequestException as e:
-            return [], [], f"Error: {str(e)}"
+        except requests.exceptions.RequestException as exception_message:
+            return [], [], f"Error: {str(exception_message)}"
     return [], [], ""
 
 
