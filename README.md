@@ -1,6 +1,6 @@
 # **Portfolio Analytics Calculation Engine**
 
-This project provides a bolierplate for a modular YAML based portfolio analytics calculation engine. This engine allows to plug in  YAML configurations to compute various portfolio related analytics. Engine adheres to YAML schema and is utilising Polars or Python instructions. This project also hosts a dash app that relies on a local LLM model to create schema comliant YAML files. These YAML files are consumed and interpreted by the calculation engine provided. 
+This project provides a bolierplate for a modular YAML based portfolio analytics calculation engine. This engine allows to plug in  YAML configurations to compute various portfolio related analytics. Engine adheres to YAML schema and is utilising Polars or Python instructions. This project also hosts a dash app that relies on a local LLM model to create schema compliant YAML files. These YAML files are consumed and interpreted by the calculation engine provided. 
 
 ---
 
@@ -12,9 +12,12 @@ This project provides a bolierplate for a modular YAML based portfolio analytics
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
-  - [Running the Metrics Runner](#running-the-metrics-runner)
-  - [Generating Documentation](#generating-documentation)
-  - [Running Regression Tests](#running-regression-tests)
+  - [Running Analytics defined in JSON config file](#Running-Analytics-defined-in-JSON-config-file)
+  - [unning Regression Tests](#Running-Regression-Tests)
+  - [Running Unit Tests](#Running-Unit-Tests)
+  - [Running Analytics via CURL Command](#Running-Analytics-via-CURL-Command)
+  - [Running Analytics via Web UI](#Running-Analytics-via-Web-UI)
+  - [Generating YAML config Files with GPT Assistant](#Generating-YAML-config-Files-with-GPT-Assistant)
 - [Project Structure](#project-structure)
 - [Customization](#customization)
 - [License](#license)
