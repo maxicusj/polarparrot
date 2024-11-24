@@ -1,0 +1,64 @@
+metric_name: "Id: 0005, Top 5 Currencies by Country"
+required_data:
+  - table: instrument_categorization
+    columns: ["currency", "country", "instrument_id"]
+    join_on: "instrument_id"
+task:
+  description: >
+    Process the positions and instrument_categorization data to group by currency and country,
+    selecting the top 5 currencies per country by total weight. Columns will be renamed and adjusted
+    to match the schema: category, metric_name, position_count, weight_1, weight_2, weight_3, weight_4.
+  steps:
+    - step: Join positions with instrument_categorization
+      action: Join the positions table with the instrument_categorization table on instrument_id.
+      polars: |
+        # Join with instrument_categorization on instrument_id
+        positions_with_ic = positions_pl.join(
+            instrument_categorization_pl,
+            on='instrument_id',
+            how='inner'
+        )
+    - step: Aggregate weights and position counts
+      action: Group by currency and country, and calculate the sum of weights and position count.
+      polars: |
+        # Aggregate weights and position count
+        aggregated_positions = positions_with_ic.select(
+            [
+                pl.col("currency"),
+                pl.col("country"),
+                pl.sum("weight_1").alias("weight_1"),
+                pl.sum("weight_2").alias("weight_2"),
+                pl.sum("weight_3").alias("weight_3"),
+                pl.sum("weight_4").alias("weight_4"),
+                pl.count("instrument_id").alias("position_count")
+            ]
+        )
+    - step: Create category column
+      action: Dynamically create the category column combining currency and country.
+      polars: |
+        # Create the category column
+        aggregated_positions = aggregated_positions.with_columns(
+            (pl.col("currency") + " by " + pl.col("country")).alias("category")
+        )
+    - step: Sort and select top rows
+      action: Sort the data by country and currency, then select the top 5 rows.
+      polars: |
+        # Sort and select top rows
+        sorted_positions = aggregated_positions.sort(["country", "currency"]).limit(5)
+    - step: Finalize and rename columns
+      action: Rename and select columns to adhere to the required schema.
+      polars: |
+        # Finalize and rename columns
+        result = sorted_positions.select(
+            [
+                pl.col("category"),
+                pl.lit("Top 5 Currencies by Country").alias("metric_name"),
+                pl.col("position_count"),
+                pl.col("weight_1"),
+                pl.col("weight_2"),
+                pl.col("weight_3"),
+                pl.col("weight_4")
+            ]
+        )
+        # Optional: Sort by category
+        result = result.sort("category")

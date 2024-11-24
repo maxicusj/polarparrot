@@ -1,9 +1,12 @@
+drop table if exists [dbo].[instrument_categorization]
+go
+
 CREATE TABLE [dbo].[instrument_categorization] (
     [instrument_id]      INT          NULL,
     [credit_parent_name] VARCHAR (50) NULL,
     [sector1]            VARCHAR (50) NULL,
     [sector2]            VARCHAR (50) NULL,
-    [counrty]            VARCHAR (50) NULL,
+    [country]            VARCHAR (50) NULL,
     [currency]           VARCHAR (3)  NULL,
     [ed]                 DATE         NULL
 );
@@ -20,7 +23,7 @@ BEGIN
         credit_parent_name,
         sector1,
         sector2,
-        counrty,
+        country,
         currency,
         ed
     )

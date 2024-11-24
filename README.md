@@ -88,17 +88,6 @@ The analytics calculation engine is designed to process data based on instructio
    ```
    Access the web UI at [http://localhost:8050](http://localhost:8050).
 
-5. **Test via CURL Command**  
-   You can test the backend service with a sample request:
-   ```bash
-   curl -X POST http://localhost:8088/analytics \
-   -H "Content-Type: application/json" \
-   -d '{
-     "positions_json": "[{\"instrument_id\": 1, \"weight_1\": 0.00005, \"weight_2\": 0.00004, \"weight_3\": 0.00003, \"weight_4\": 0.00005, \"is_laggard\": true}, {\"instrument_id\": 2, \"weight_1\": 0.00007, \"weight_2\": 0.00006, \"weight_3\": 0.00007, \"weight_4\": 0.00006, \"is_laggard\": false}, {\"instrument_id\": 3, \"weight_1\": 0.0001, \"weight_2\": 0.00008, \"weight_3\": 0.00002, \"weight_4\": 0.0001, \"is_laggard\": true}, {\"instrument_id\": 4, \"weight_1\": 0.00002, \"weight_2\": 0.00005, \"weight_3\": 0.00009, \"weight_4\": 0.00002, \"is_laggard\": true}, {\"instrument_id\": 5, \"weight_1\": 0.00009, \"weight_2\": 0.00007, \"weight_3\": 0.00005, \"weight_4\": 0.00007, \"is_laggard\": false}]", 
-     "analytics_list_json": "{\"analytics\": [\"yaml/0002.yaml\", \"yaml/0004.yaml\"]}"
-   }'
-   ```
-
 ---
 
 ## **Usage**
@@ -120,6 +109,17 @@ Run the selected YAML metrics against mockup test data:
 ```bash
 python unit_tests_runner.py
 ```
+
+### **Running via CURL Command**  
+   You can test the backend service with a sample request:
+   ```bash
+   curl -X POST http://localhost:8088/analytics \
+   -H "Content-Type: application/json" \
+   -d '{
+     "positions_json": "[{\"instrument_id\": 1, \"weight_1\": 0.00005, \"weight_2\": 0.00004, \"weight_3\": 0.00003, \"weight_4\": 0.00005, \"is_laggard\": true}, {\"instrument_id\": 2, \"weight_1\": 0.00007, \"weight_2\": 0.00006, \"weight_3\": 0.00007, \"weight_4\": 0.00006, \"is_laggard\": false}, {\"instrument_id\": 3, \"weight_1\": 0.0001, \"weight_2\": 0.00008, \"weight_3\": 0.00002, \"weight_4\": 0.0001, \"is_laggard\": true}, {\"instrument_id\": 4, \"weight_1\": 0.00002, \"weight_2\": 0.00005, \"weight_3\": 0.00009, \"weight_4\": 0.00002, \"is_laggard\": true}, {\"instrument_id\": 5, \"weight_1\": 0.00009, \"weight_2\": 0.00007, \"weight_3\": 0.00005, \"weight_4\": 0.00007, \"is_laggard\": false}]", 
+     "analytics_list_json": "{\"analytics\": [\"yaml/0002.yaml\", \"yaml/0004.yaml\"]}"
+   }'
+   ```
 
 ---
 
