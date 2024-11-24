@@ -110,9 +110,15 @@ python metrics_runner.py analytics_list.json
 ```
 
 ### **Running Regression Tests**
-Run regression on YAML metrics against mockup test data:
+Run regression on YAML metrics against mockup test data in data.py:
 ```bash
 python regression_runner.py
+```
+
+### **Running the Unit Tests Runner**
+Run the selected YAML metrics against mockup test data:
+```bash
+python unit_tests_runner.py
 ```
 
 ---
