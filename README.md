@@ -2,9 +2,10 @@
 
 This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars. It also hosts a dash app that enables LLM model to create YAML schema comliant yaml files that can be consumed and interpreted by the calculation engine. 
 
-<iframe width="560" height="315" src="https://youtu.be/Ni_uL8xlDas" frameborder="0" allowfullscreen></iframe>
 
-[![Watch the video](./path-to-preview-image.png)](https://youtu.be/Ni_uL8xlDas)
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Ni_uL8xlDas/0.jpg)](https://www.youtube.com/watch?v=Ni_uL8xlDas))
+
 
 
 
