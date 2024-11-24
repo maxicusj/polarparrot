@@ -4,6 +4,11 @@ import os
 import polars as pl
 import textwrap
 import yaml
+import sys
+import os
+
+# Add the parent directory of the current script to PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from calculation_engine import CalculationEngine
 from polars.testing import assert_frame_equal
 

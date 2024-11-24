@@ -117,13 +117,13 @@ python metrics_runner.py analytics_list.json
 ### **Running Regression Tests**
 Run regression on YAML metrics against mockup test data in data.py:
 ```bash
-python regression_runner.py
+python tests/regression_runner.py
 ```
 
 ### **Running Unit Tests**
 Run the selected YAML metrics against mockup test data:
 ```bash
-python unit_tests_runner.py
+python tests/unit_tests_runner.py
 ```
 
 ### **Running Analytics via CURL Command**  

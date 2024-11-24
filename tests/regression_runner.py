@@ -2,6 +2,12 @@
 import json
 import yaml
 import pandas as pd
+import sys
+import os
+
+# Add the parent directory of the current script to PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from data.data import get_positions_data, get_instrument_categorization_data, get_expected_output_0002, get_expected_output_0004
 
 def load_yaml(file_path):
