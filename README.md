@@ -95,12 +95,11 @@ graph TD
    DB_PASSWORD=password
    ```
 
-4. **Start Backend Services and Web UI**  
+4. **Start Backend Services, Web UI and GPT Assistant and Web UI**  
    Start the services with the provided script:
    ```bash
    ./start_services.sh
    ```
-   Access the web UI at [http://localhost:8050](http://localhost:8050).
 
 ---
 
