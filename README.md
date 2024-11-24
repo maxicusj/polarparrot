@@ -1,6 +1,6 @@
 # **Portfolio Analytics Calculation Engine**
 
-This project provides a bolierplate for a modular YAML based analytics calculation engine. This engine allows to plug in  YAML configurations to compute various portfolio related analytics. Engine adheres to YAML schema and is utilising Polars or Python instructions. This project also hosts a dash app that relies on a local LLM model to create schema comliant YAML files. These YAML files are consumed and interpreted by the calculation engine provided. 
+This project provides a bolierplate for a modular YAML based portfolio analytics calculation engine. This engine allows to plug in  YAML configurations to compute various portfolio related analytics. Engine adheres to YAML schema and is utilising Polars or Python instructions. This project also hosts a dash app that relies on a local LLM model to create schema comliant YAML files. These YAML files are consumed and interpreted by the calculation engine provided. 
 
 ---
 
