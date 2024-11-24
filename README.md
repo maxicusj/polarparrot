@@ -95,7 +95,7 @@ graph TD
    DB_PASSWORD=password
    ```
 
-4. **Start Backend Services, Web UI and GPT Assistant and Web UI**  
+4. **Start Backend Services, Web UI and GPT Assistant**  
    Start the services with the provided script:
    ```bash
    ./start_services.sh
@@ -155,6 +155,13 @@ python unit_tests_runner.py
 - **`start_services.sh`**: Starts backend services and the web UI.
 - **`requirements.txt`**: Lists required Python packages.
 - **`.env`**: Environment variables for database connection.
+
+- **`calculation_engine.py`**: The actual analytics engine.
+- **`backend_service.py`**: Backend service.
+- **`data_service.py`**: Data service, providing interface to the SQL database.
+- **`app.py`**: Web UI for running analytics against provided YAML config and portfolio positions.
+- **`gpt/gpt_service.py`**: Web UI for generating YAMLs with the help of an LLM.
+- **`data/data.sql`**: Sample SQL table and data population script for instrument_categorization table. Used by analytics engine.
 
 ---
 
