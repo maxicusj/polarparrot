@@ -106,7 +106,7 @@ graph TD
 
 ## **Usage**
 
-### **Running the Metrics Runner**
+### **Running Analytics defined in JSON config file**
 Run the selected YAML metrics against mockup test data:
 ```bash
 python metrics_runner.py analytics_list.json
@@ -118,13 +118,13 @@ Run regression on YAML metrics against mockup test data in data.py:
 python regression_runner.py
 ```
 
-### **Running the Unit Tests Runner**
+### **Running Unit Tests**
 Run the selected YAML metrics against mockup test data:
 ```bash
 python unit_tests_runner.py
 ```
 
-### **Running via CURL Command**  
+### **Running Analytics via CURL Command**  
    You can test the backend service with a sample request:
    ```bash
    curl -X POST http://localhost:8088/analytics \
@@ -135,12 +135,12 @@ python unit_tests_runner.py
    }'
    ```
 
-   ### **YAML Playground: Parrots like Polars** 
+   ### **Running Analytics via Web UI** 
    ```
    http://localhost:8050
    ```
 
-   ### **YAML Playground: GPT Parrot** 
+   ### **Generating YAML config Files with GPT Assistant** 
    ```
    http://localhost:8080
    ```
