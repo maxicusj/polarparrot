@@ -1,4 +1,4 @@
-name: Python Package Workflow
+name: Build Package
 
 on:
   push:  # Trigger on every commit
