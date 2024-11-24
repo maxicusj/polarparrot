@@ -2,6 +2,9 @@
 
 This project provides a modular YAML based portfolio analytics calculation engine. This engine allows to plug in  YAML configurations to compute various portfolio related analytics. Engine adheres to YAML schema and is utilising Polars or Python instructions. This project also hosts a dash app that relies on a local LLM model to create schema compliant YAML files. These YAML files are consumed and interpreted by the calculation engine provided. 
 
+[![Pacakge Build Status](https://github.com/maxicusj/polarparrot/actions/workflows/python-package.yml/badge.svg)](https://github.com/maxicusj/polarparrot/actions/workflows/python-package.yml)
+
+[![Package Release Status](https://github.com/maxicusj/polarparrot/actions/workflows/publish.yml/badge.svg)](https://github.com/maxicusj/polarparrot/actions/workflows/publish.yml)
 ---
 
 ## **Table of Contents**
