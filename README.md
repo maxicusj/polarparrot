@@ -36,7 +36,7 @@ graph TD
     G -->|Fetches data from| D[SQL Server]
     C -->|Processes YAML files with| E[Calculation Engine]
     E -->|Uses| F[Polars]
-    E -->|Uses| J[YAML Files]
+    E -->|Uses| I[YAML Files]
     C -->|Interacts with| H[GPT App]
     H -->|Generates| I[YAML Files]
     C -->|Returns results to| B
