@@ -4,6 +4,9 @@ This project provides a modular analytics calculation engine that allows you to 
 
 <iframe width="560" height="315" src="https://youtu.be/Ni_uL8xlDas" frameborder="0" allowfullscreen></iframe>
 
+[![Watch the video](./path-to-preview-image.png)](https://youtu.be/Ni_uL8xlDas)
+
+
 
 ```mermaid
 graph TD
