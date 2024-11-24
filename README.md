@@ -2,6 +2,7 @@
 
 This project provides a modular analytics calculation engine that allows you to plug in different YAML configurations to compute various analytics using Polars.
 
+```mermaid
 graph TD
     A[User] -->|Interacts with| B[Dash Web UI]
     B -->|Sends JSON data| C[Backend Service]
@@ -11,6 +12,7 @@ graph TD
     E -->|Uses| F[Polars]
     C -->|Returns results to| B
     B -->|Displays results to| A
+
 
 ---
 
