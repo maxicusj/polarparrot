@@ -1,4 +1,4 @@
-metric_name: "Id: 0004, Sum of Weights, grouped by currency"
+metric_name: "Id: 0004, Top 5 Currencies, grouped by currency"
 required_data:
   - table: instrument_categorization
     columns: ["instrument_id", "currency"]

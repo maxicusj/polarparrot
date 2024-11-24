@@ -28,6 +28,7 @@ class CalculationEngine:
         self.yaml_file = yaml_file
         self.parsed_yaml = None
         self.exec_namespace = {'pl': pl}
+        self.load_yaml()  # Ensure YAML is loaded during initialization
 
     def load_yaml(self):
         """
@@ -55,13 +56,10 @@ class CalculationEngine:
 
         for step in steps:
             print(f"Executing Step: {step['step']}")
-            # Execute code in 'code' section if present
+            # Execute code in 'python' section if present
             if 'python' in step:
                 code = step['python']
-                exec(code, self.exec_namespace)            
-            # if 'code' in step and 'python' in step['code']:
-            #     code = step['code']['python']
-            #     exec(code, self.exec_namespace)
+                exec(code, self.exec_namespace)
             # Execute code in 'polars' section if present
             if 'polars' in step:
                 code = step['polars']
