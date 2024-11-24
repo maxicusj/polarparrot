@@ -11,7 +11,7 @@ setup(
     author="Roman Maxymchuk",
     author_email="rom555@me.com",
     description="Modular YAML based portfolio analytics calculation engine",
-    long_description="README.md",  # Use the README.md file as the long description
+    long_description=long_description,  # Use the README.md file as the long description
     long_description_content_type="text/markdown",  # README format
     url="https://github.com/maxicusj/polarparrot",  # GitHub repo URL
     project_urls={
@@ -22,7 +22,7 @@ setup(
         "License :: OSI Approved :: MIT License",  # Replace with your license
         "Operating System :: OS Independent",
     ],
-    packages=find_packages(),  # Automatically discover sub-packages
+    packages=find_packages(include=["polarparrot", "polarparrot.*","*"]),
     python_requires=">=3.11",  # Minimum Python version required
     install_requires=[
         "pyodbc>=5.2.0",  # Add your dependencies here (e.g., 'requests>=2.25.1')
@@ -35,5 +35,5 @@ setup(
     #         "my-command=my_package.module:main",  # Replace with your CLI commands
     #     ],
     # },
-    include_package_data=True,  # Include files listed in MANIFEST.in
+    include_package_data=True  # Include files listed in MANIFEST.in
 )
