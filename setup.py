@@ -6,7 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="polarparrot",  # Replace with your package's name
-    version="0.0.3",    # Initial version number
+    use_scm_version=True,
+    setup_requires=["setuptools_scm"],
     author="Roman Maxymchuk",
     author_email="rom555@me.com",
     description="Modular YAML based portfolio analytics calculation engine",

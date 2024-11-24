@@ -39,3 +39,17 @@ jobs:
         run: |
           python tests/unit_tests_runner.py
 
+      # # Step 6: add tag
+      # - name: Get the current tag
+      #   id: get_tag
+      #   run: |
+      #     TAG=$(git describe --tags --abbrev=0)
+      #     echo "::set-output name=TAG::$TAG"
+
+      # - name: Create new tag
+      #   id: create_tag
+      #   run: |
+      #     NEW_TAG=$(date +'%Y%m%d%H%M%S')
+      #     echo "New tag: $NEW_TAG"
+      #     git tag $NEW_TAG
+      #     git push origin $NEW_TAG
