@@ -6,5 +6,137 @@ using YAML and polars syntax give me 0004.yaml, similar to 0002.yaml, based on y
 #0002.yaml #yaml_schema.json
   "message": "Error processing YAML file 'yaml/0005.yaml': Error processing YAML file 'yaml/0005.yaml': metric_name\n\nResolved plan until failure:\n\n\t---> FAILED HERE RESOLVING 'sort' <---\nRENAME\n  SLICE[offset: 0, len: 5]\n    SORT BY [col(\"country\"), col(\"currency\")]\n       WITH_COLUMNS:\n       [col(\"currency\").str.concat_horizontal([String( by ), col(\"country\")]).alias(\"category\")] \n         SELECT [col(\"currency\"), col(\"country\"), col(\"weight_1\").sum().alias(\"weight_1\"), col(\"weight_2\").sum().alias(\"weight_2\"), col(\"weight_3\").sum().alias(\"weight_3\"), col(\"weight_4\").sum().alias(\"weight_4\"), col(\"instrument_id\").count().alias(\"position_count\")] FROM\n          INNER JOIN:\n          LEFT PLAN ON: [col(\"instrument_id\")]\n            DF [\"instrument_id\", \"weight_1\", \"weight_2\", \"weight_3\"]; PROJECT */6 COLUMNS; SELECTION: None\n          RIGHT PLAN ON: [col(\"instrument_id\")]\n            DF [\"country\", \"currency\", \"instrument_id\"]; PROJECT */3 COLUMNS; SELECTION: None\n          END INNER JOIN",
   "status": "error"
-  
+
 https://chatgpt.com/share/6742e6cf-fc18-8008-aa4c-16d257dae4cb
+
+////only textual prompt
+
+
+Using YAML and polars syntax give me 0004.yaml, similar to 0002.yaml, based on yaml_schema.json that will group positions polars dataset by currency column from instrument_categorization table and select top 5 currency asc. Make sure to do the rename step at the end, e.g. # Rename 'credit_parent_name' to 'category' result = grouped_positions.rename({'credit_parent_name': 'category'}) # Optional: Sort by category result = result.sort('category') Resulting frame should adhere to the schema: category metric_name position_count weight_1 weight_2 weight_3 weight_4
+
+code 0002.yaml:
+metric_name: "Id: 0002, Sum of Weights, grouped by credit_parent_name"
+required_data:
+  - table: instrument_categorization
+    columns: ["credit_parent_name","instrument_id"]
+    join_on: "instrument_id"
+task:
+  description: >
+    Process the positions and instrument_categorization data to obtain a list of positions where is_laggard is True, weights are adjusted based on a threshold, and data is grouped by credit_parent_name with total sums of weights.
+  steps:
+    - step: Filter positions where is_laggard is True and apply weight threshold
+      action: >
+        Filter positions where is_laggard is True and set weights below or equal to 0.00006 to zero.
+      polars: |
+        threshold = 0.00006
+        # Filter positions where is_laggard is True
+        positions_laggard = positions_pl.filter(pl.col('is_laggard') == True)
+        # Apply threshold to weight columns
+        positions_laggard = positions_laggard.with_columns([
+            pl.when(pl.col(f'weight_{i}') > threshold)
+              .then(pl.col(f'weight_{i}'))
+              .otherwise(0)
+              .alias(f'weight_{i}') for i in range(1, 5)
+        ])
+    - step: Join positions with instrument_categorization
+      action: Join the filtered positions with instrument_categorization on instrument_id.
+      polars: |
+        # Join with instrument_categorization on instrument_id
+        positions_with_ic = positions_laggard.join(
+            instrument_categorization_pl,
+            on='instrument_id',
+            how='inner'
+        )
+    - step: Group by credit_parent_name and aggregate weights
+      action: Group the data by credit_parent_name and aggregate weight columns with sums.
+      polars: |
+        # Group by credit_parent_name and aggregate weights
+        grouped_positions = positions_with_ic.group_by('credit_parent_name').agg([
+            pl.sum(f'weight_{i}').alias(f'weight_{i}') for i in range(1, 5)
+        ] + [
+            pl.count('instrument_id').alias('position_count')
+        ])
+        # Rename 'credit_parent_name' to 'category'
+        result = grouped_positions.rename({'credit_parent_name': 'category'})
+        # Optional: Sort by category
+        result = result.sort('category')
+
+
+code yaml_schema.json:
+
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["metric_name", "required_data", "task"],
+  "properties": {
+    "metric_name": {
+      "type": "string",
+      "description": "The name of the metric being calculated."
+    },
+    "required_data": {
+      "type": "array",
+      "description": "List of additional data tables needed for processing.",
+      "items": {
+        "type": "object",
+        "required": ["table", "columns", "join_on"],
+        "properties": {
+          "table": {
+            "type": "string",
+            "description": "The name of the required table."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Columns to fetch from the table.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "join_on": {
+            "type": "string",
+            "description": "The column used to join this table with the positions."
+          }
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "required": ["description", "steps"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description of the task being performed."
+        },
+        "steps": {
+          "type": "array",
+          "description": "Steps to perform the calculation.",
+          "items": {
+            "type": "object",
+            "required": ["step", "action"],
+            "properties": {
+              "step": {
+                "type": "string",
+                "description": "The name or description of the step."
+              },
+              "action": {
+                "type": "string",
+                "description": "A detailed explanation of what the step does."
+              },
+              "python": {
+                "type": "string",
+                "description": "Python code to execute for this step.",
+                "minLength": 1
+              },
+              "polars": {
+                "type": "string",
+                "description": "Polars code to execute for this step.",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}
+

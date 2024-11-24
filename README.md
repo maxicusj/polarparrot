@@ -10,6 +10,8 @@ graph TD
     G -->|Fetches data from| D[SQL Server]
     C -->|Processes YAML files with| E[Calculation Engine]
     E -->|Uses| F[Polars]
+    C -->|Interacts with| H[GPT App]
+    H -->|Generates| I[YAML Files]
     C -->|Returns results to| B
     B -->|Displays results to| A
 ```
@@ -53,8 +55,9 @@ The analytics calculation engine is designed to process data based on instructio
 
 ### **Prerequisites**
 
-- SQL Server database (e.g., SQL Server Docker container) to simulate database access.
-- Python 3.7 or higher.
+- SQL Server database (e.g., SQL Server Docker container) to simulate database access. One can use docker image, e.g. https://github.com/chriseaton/docker-adventureworks, https://hub.docker.com/r/chriseaton/adventureworks
+- Python 3.11 or higher.
+- For GPT app to work local installation of ollama with some LLM models is needed. See https://ollama.com
 - Packages listed in `requirements.txt`.
 
 ---
@@ -120,6 +123,17 @@ python unit_tests_runner.py
      "analytics_list_json": "{\"analytics\": [\"yaml/0002.yaml\", \"yaml/0004.yaml\"]}"
    }'
    ```
+
+   ### **YAML Playground: Parrots like Polars** 
+   ```
+   http://localhost:8050
+   ```
+
+   ### **YAML Playground: GPT Parrot** 
+   ```
+   http://localhost:8080
+   ```
+
 
 ---
 

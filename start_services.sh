@@ -15,6 +15,11 @@ echo "Starting Plotly Dash app..."
 python app.py &
 DASH_PID=$!
 
+# Start the GPT service
+echo "Starting GPT APP..."
+python gpt/gpt_service.py &
+GPT_PID=$!
+
 # Wait for all services to start
 sleep 2
 
@@ -22,6 +27,7 @@ echo "Services started successfully."
 echo "Flask data service PID: $FLASK_DS_PID"
 echo "Flask backend PID: $FLASK_PID"
 echo "Dash app PID: $DASH_PID"
+echo "GPT app PID: $DASH_PID"
 
 # Function to clean up on exit
 cleanup() {
@@ -29,6 +35,7 @@ cleanup() {
   kill $FLASK_PID
   kill $DASH_PID
   kill $FLASK_DS_PID
+  kill $GPT_PID  
   echo "Services stopped."
 }
 

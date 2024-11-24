@@ -64,7 +64,7 @@ default_analytics_list_json = json.dumps(
 app.layout = dbc.Container(
     [
         dbc.Row(
-            dbc.Col(html.H1("YAML Playground (Parrots like Polars)", className="text-center my-4"))
+            dbc.Col(html.H1("YAML Playground: Parrots like Polars", className="text-center my-4"))
         ),
         dbc.Row(
             [
