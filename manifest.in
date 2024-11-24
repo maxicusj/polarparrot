@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include yaml/*.yaml
+include data/*.sql
+include data/*.json
+include docs/source/*.rst
+include gpt/*.txt
+include yaml/*.json
+include *.json
+include *.txt
+include *.py
+
