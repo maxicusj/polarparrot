@@ -57,14 +57,20 @@ default_positions_json = json.dumps(
 )
 
 default_analytics_list_json = json.dumps(
-    {"analytics": ["yaml/0001.yaml", "yaml/0002.yaml"]}, indent=4
+    {"analytics": ["yaml/0001.yaml", "yaml/0002.yaml"]},
+    indent=4,
 )
 
 # Define the layout of the app
 app.layout = dbc.Container(
     [
         dbc.Row(
-            dbc.Col(html.H1("YAML Playground: Parrots like Polars", className="text-center my-4"))
+            dbc.Col(
+                html.H1(
+                    "YAML Playground: Parrots like Polars",
+                    className="text-center my-4",
+                )
+            )
         ),
         dbc.Row(
             [
@@ -96,7 +102,11 @@ app.layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dbc.Button(
-                    "Submit", id="submit-button", n_clicks=0, color="primary", className="mb-4"
+                    "Submit",
+                    id="submit-button",
+                    n_clicks=0,
+                    color="primary",
+                    className="mb-4",
                 ),
                 className="text-center",
             )
@@ -167,21 +177,23 @@ def submit_data(n_clicks, positions_json, analytics_list_json):
                             results.append(yaml_result)
 
                     # Dynamically generate columns
-                    if len(results) > 0:
+                    if results:
                         columns = [{"name": col, "id": col} for col in results[0].keys()]
                     else:
                         columns = []
 
-                    status_message = f"Generated {len(result_data['results'])} rows in {elapsed_time:.2f} seconds."
+                    status_message = (
+                        f"Generated {len(result_data['results'])} rows "
+                        f"in {elapsed_time:.2f} seconds."
+                    )
                     return results, columns, status_message
-                else:
-                    return [], [], f"Error: {result_data.get('message', 'Unknown error.')}"
-            else:
-                return [], [], f"Error: Backend service returned status code {response.status_code}."
+                return [], [], f"Error: {result_data.get('message', 'Unknown error.')}"
+            return [], [], f"Error: Backend service returned status code {response.status_code}."
 
         except requests.exceptions.RequestException as e:
             return [], [], f"Error: {str(e)}"
     return [], [], ""
+
 
 # Run the Dash app
 if __name__ == "__main__":
