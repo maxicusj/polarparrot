@@ -4,7 +4,10 @@ This project provides a modular YAML based portfolio analytics calculation engin
 
 [![Build Package](https://github.com/maxicusj/polarparrot/actions/workflows/python-package.yml/badge.svg)](https://github.com/maxicusj/polarparrot/actions/workflows/python-package.yml)
 
+[![CodeQL Advanced](https://github.com/maxicusj/polarparrot/actions/workflows/codeql.yml/badge.svg)](https://github.com/maxicusj/polarparrot/actions/workflows/codeql.yml)
+
 [![Release Package to PyPi](https://github.com/maxicusj/polarparrot/actions/workflows/publish.yml/badge.svg)](https://github.com/maxicusj/polarparrot/actions/workflows/publish.yml)
+
 ---
 
 ## **Table of Contents**
