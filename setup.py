@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="polarparrot",  # Replace with your package's name
+    name="polarparrot",  
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     author="Roman Maxymchuk",
