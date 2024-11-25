@@ -1,8 +1,22 @@
 """
-calculation_engine.py
-
 This module defines the CalculationEngine class, which executes analytics calculations
 based on instructions provided in YAML configuration files.
+
+The CalculationEngine is designed to handle configurations that may include Python 
+and Polars code snippets, as well as nested includes from other YAML files.
+
+Use Cases:
+- Automated data transformations.
+- Customizable analytics workflows.
+
+Limitations:
+- YAML files must conform to a specific structure.
+- Assumes Polars and Python code snippets are correctly formatted.
+
+Example:
+    engine = CalculationEngine('config.yaml')
+    data = {'df': pl.DataFrame(...)}
+    result = engine.execute_steps(data)
 """
 
 import polars as pl
@@ -12,18 +26,22 @@ class CalculationEngine:
     """
     A class to execute analytics calculations based on YAML configurations.
 
-    Attributes:
-        yaml_file (str): Path to the YAML configuration file.
-        parsed_yaml (dict): Parsed YAML content.
-        exec_namespace (dict): Namespace for executing code snippets.
+    The CalculationEngine is particularly suited for tasks that involve:
+    - Data manipulations using Polars DataFrames.
+    - Custom analytics workflows written in Python or Polars.
     """
 
     def __init__(self, yaml_file):
         """
         Initialize the CalculationEngine with a YAML configuration file.
+        exec_namespace (dict): Namespace for executing code snippets, initialized with 
+        Polars (imported as `pl`).
 
         Args:
             yaml_file (str): Path to the YAML configuration file.
+
+        Note:
+            Automatically loads and parses the YAML file during initialization.
         """
         self.yaml_file = yaml_file
         self.parsed_yaml = None
@@ -33,6 +51,10 @@ class CalculationEngine:
     def load_yaml(self):
         """
         Load and parse the YAML configuration file.
+
+        Raises:
+            FileNotFoundError: If the YAML file does not exist.
+            yaml.YAMLError: If the YAML file cannot be parsed.
         """
         with open(self.yaml_file, 'r') as file:
             self.parsed_yaml = yaml.safe_load(file)
@@ -42,10 +64,16 @@ class CalculationEngine:
         Execute the steps defined in the YAML configuration.
 
         Args:
-            data_namespace (dict): Namespace containing data variables.
+            data_namespace (dict): Namespace containing data variables to be used 
+            during code execution.
 
         Returns:
-            Any: The result of the analytics calculation.
+            Any: The result of the analytics calculation, typically stored in the 
+            `result` key of `exec_namespace`.
+
+        Note:
+            The YAML file must define a structure with a 'task' key containing a 
+            list of 'steps'. Each step can include 'python' or 'polars' code snippets.
         """
         # Merge data_namespace into exec_namespace
         self.exec_namespace.update(data_namespace)
@@ -76,6 +104,10 @@ class CalculationEngine:
 
         Returns:
             list: Resolved list of steps.
+
+        Note:
+            Includes are resolved recursively, and steps are merged in the order 
+            they are encountered. Conflicts or duplicate steps are not handled explicitly.
         """
         resolved_steps = []
         for step in steps:
