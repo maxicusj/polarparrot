@@ -22,6 +22,7 @@ Example:
 import polars as pl
 import yaml
 
+
 class CalculationEngine:
     """
     A class to execute analytics calculations based on YAML configurations.
@@ -34,14 +35,18 @@ class CalculationEngine:
     def __init__(self, yaml_file):
         """
         Initialize the CalculationEngine with a YAML configuration file.
-        exec_namespace (dict): Namespace for executing code snippets, initialized with 
-        Polars (imported as `pl`).
 
         Args:
             yaml_file (str): Path to the YAML configuration file.
 
         Note:
             Automatically loads and parses the YAML file during initialization.
+
+        Attributes:
+            yaml_file (str): Path to the provided YAML configuration file.
+            parsed_yaml (dict): Parsed content of the YAML configuration file.
+            exec_namespace (dict): Namespace for executing code snippets, initialized
+                                   with Polars (imported as `pl`).
         """
         self.yaml_file = yaml_file
         self.parsed_yaml = None
@@ -65,11 +70,11 @@ class CalculationEngine:
 
         Args:
             data_namespace (dict): Namespace containing data variables to be used 
-            during code execution.
+                                   during code execution.
 
         Returns:
             Any: The result of the analytics calculation, typically stored in the 
-            `result` key of `exec_namespace`.
+                 `result` key of `exec_namespace`.
 
         Note:
             The YAML file must define a structure with a 'task' key containing a 
@@ -86,12 +91,11 @@ class CalculationEngine:
             print(f"Executing Step: {step['step']}")
             # Execute code in 'python' section if present
             if 'python' in step:
-                code = step['python']
-                exec(code, self.exec_namespace)
+                exec(step['python'], self.exec_namespace)
             # Execute code in 'polars' section if present
             if 'polars' in step:
-                code = step['polars']
-                exec(code, self.exec_namespace)
+                exec(step['polars'], self.exec_namespace)
+
         # Return the result from exec_namespace
         return self.exec_namespace.get('result')
 
@@ -118,9 +122,7 @@ class CalculationEngine:
                     included_yaml = yaml.safe_load(file)
                 included_steps = included_yaml['task']['steps']
                 # Recursively resolve includes
-                included_steps = self._resolve_includes(included_steps)
-                resolved_steps.extend(included_steps)
+                resolved_steps.extend(self._resolve_includes(included_steps))
             else:
                 resolved_steps.append(step)
         return resolved_steps
-
