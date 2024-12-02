@@ -1,7 +1,6 @@
 import dash
-from dash import html, dcc, Output, Input, State
+from dash import html, dcc, Output, Input, State, dash_table
 import dash_bootstrap_components as dbc
-import dash_table
 import base64
 import io
 import fitz  # PyMuPDF
@@ -79,47 +78,15 @@ app.layout = dbc.Container([
             ),
             html.Div(id='threshold-help', className="text-muted", style={'fontSize': '12px'}),
             
-            html.Button('Compare', id='compare-button', n_clicks=0, className="mt-3"),
-            # New: Explain Button 
-
-            html.Button('Explain', id='explain-button', n_clicks=0, className="mt-3", disabled=True),
-            html.Button('Download', id='download-pdf-button', n_clicks=0, className="mt-3"),
-         
+            # Buttons on the same row
+            dbc.Row([
+                dbc.Col(dbc.Button('Compare', id='compare-button', n_clicks=0, className="mt-3 w-100", color="primary"), width=4),
+                dbc.Col(dbc.Button('Explain', id='explain-button', n_clicks=0, className="mt-3 w-100", color="secondary", disabled=True), width=4),
+                dbc.Col(dbc.Button('Download', id='download-pdf-button', n_clicks=0, className="mt-3 w-100", color="success"), width=4),
+            ], className="mt-2"),
             html.Div(id='progress-output', style={'margin-top': '10px'}, className="mt-2"),
-         
             html.Div(id='explain-progress-output', style={'margin-top': '10px'}, className="mt-2"),
-            # New: Legend for Difference Types
-            html.Div([
-                html.H6("Legend:"),
-                dbc.Row([
-                    dbc.Col([
-                        html.Span(style={'display': 'inline-block', 'width': '15px', 'height': '15px',
-                                         'backgroundColor': 'red', 'borderRadius': '50%', 'margin-right': '5px'}),
-                        html.Span("Significant Numeric Difference")
-                    ]),
-                ]),
-                dbc.Row([
-                    dbc.Col([
-                        html.Span(style={'display': 'inline-block', 'width': '15px', 'height': '15px',
-                                         'backgroundColor': 'orange', 'borderRadius': '50%', 'margin-right': '5px'}),
-                        html.Span("Insignificant Numeric Difference")
-                    ]),
-                ]),
-                dbc.Row([
-                    dbc.Col([
-                        html.Span(style={'display': 'inline-block', 'width': '15px', 'height': '15px',
-                                         'backgroundColor': 'green', 'borderRadius': '50%', 'margin-right': '5px'}),
-                        html.Span("Zero to Non-Zero Change")
-                    ]),
-                ]),
-                dbc.Row([
-                    dbc.Col([
-                        html.Span(style={'display': 'inline-block', 'width': '15px', 'height': '15px',
-                                         'backgroundColor': 'blue', 'borderRadius': '50%', 'margin-right': '5px'}),
-                        html.Span("Text Difference")
-                    ]),
-                ]),
-            ], className="mt-4"),
+            # Legend is now optional since we're adding indicators to the table
             dcc.Download(id='download-pdf'),
         ], width=3),
         dbc.Col([
@@ -142,7 +109,6 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            
             html.H5("Summary of Differences", className="mt-4"),
             html.Div(id='differences-count', className="mt-2"),
             dcc.Loading(
@@ -150,7 +116,7 @@ app.layout = dbc.Container([
                 type="default",
                 children=html.Div(id='summary-table')
             )
-        ],),
+        ]),
     ]),
     dcc.Store(id='diff-data-store'),            # Store for initial differences
     dcc.Store(id='ai-explanations-store'),     # Store for AI explanations
@@ -503,21 +469,22 @@ def create_summary_table(differences_summary):
     return dash_table.DataTable(
         data=df.to_dict('records'),
         columns=[
-            {'name': 'Diff. Id', 'id': 'id'},
-            {'name': 'Value File 1', 'id': 'value_file1'},
-            {'name': 'Value File 2', 'id': 'value_file2'},
-            {'name': 'Difference Explanation', 'id': 'difference_explanation'}
+            {'name': '', 'id': 'id'},  # Remove header by setting empty string
+            {'name': '', 'id': 'value_file1'},
+            {'name': '', 'id': 'value_file2'},
+            {'name': '', 'id': 'difference_explanation'}
         ],
         style_cell={
             'textAlign': 'left',
             'whiteSpace': 'normal',
             'height': 'auto',
             'maxWidth': '200px',
-            'wordWrap': 'break-word'
+            'wordWrap': 'break-word',
+            'fontFamily': 'Arial, sans-serif',
+            'fontSize': '14px'
         },
         style_header={
-            'backgroundColor': 'rgb(230, 230, 230)',
-            'fontWeight': 'bold'
+            'display': 'none'  # Hide the header
         },
         style_table={
             'minWidth': '300px',
@@ -690,8 +657,8 @@ def handle_buttons(compare_clicks, explain_clicks, options, custom_prompt, thres
         images1 = highlight_differences_on_images(pdf1_data, differences)
         images2 = highlight_differences_on_images(pdf2_data, differences)
 
-        # Store compared images
-        compared_images_store = images1 + images2  # Combine both sets of images
+        # Store compared images as a dictionary
+        compared_images_store = {'images1': images1, 'images2': images2}  # Store images separately
 
         # Display images side by side within a scrollable container
         image_elements = []
@@ -831,13 +798,24 @@ def update_summary_table(diff_data, ai_explanations):
         'text': 'Text'
     })
 
-    # Create counts table
+    # Map types to Unicode icons for indicators
+    type_icon_map = {
+        'Significant': '🔴',
+        'Insignificant': '🟠',
+        'Zero to Non-Zero': '🟢',
+        'Text': '🔵'
+    }
+
+    # Create an 'Icon' column with the Unicode icons
+    counts['Type'] = counts['Type'].apply(lambda t: f"{type_icon_map.get(t, '')} {t}")
+
+    # Create counts table without using dangerously_allow_html
     counts_table = dash_table.DataTable(
         data=counts.to_dict('records'),
         columns=[
-            {'name': 'Type', 'id': 'Type'},
-            {'name': 'Count', 'id': 'Count'},
-            {'name': 'Percentage', 'id': 'Percentage'},
+            {'name': '', 'id': 'Type'},
+            {'name': '', 'id': 'Count'},
+            {'name': '', 'id': 'Percentage'},
         ],
         style_cell={
             'textAlign': 'left',
@@ -846,11 +824,12 @@ def update_summary_table(diff_data, ai_explanations):
             'height': 'auto',
             'width': 'auto',
             'maxWidth': '150px',
-            'wordWrap': 'break-word'
+            'wordWrap': 'break-word',
+            'fontFamily': 'Arial, sans-serif',
+            'fontSize': '14px'
         },
         style_header={
-            'backgroundColor': 'rgb(230, 230, 230)',
-            'fontWeight': 'bold'
+            'display': 'none'  # Hide the header
         },
         style_table={
             'minWidth': '200px',
@@ -858,22 +837,16 @@ def update_summary_table(diff_data, ai_explanations):
             'overflowX': 'auto'
         },
         page_size=10,  # Adjust as needed
-        style_as_list_view=True
+        style_as_list_view=True,
     )
 
     # Create the detailed summary table
-    summary_table = create_summary_table(diff_data)
+    summary_table_component = create_summary_table(diff_data)
 
     # Arrange tables side by side
     summary_layout = dbc.Row([
-        dbc.Col([
-            html.H6("Difference Counts"),
-            counts_table
-        ], width=3),
-        dbc.Col([
-            html.H6("Detailed Differences"),
-            summary_table
-        ], width=9),
+        dbc.Col(counts_table, width=3),
+        dbc.Col(summary_table_component, width=9),
     ])
 
     return summary_layout
@@ -887,59 +860,32 @@ def update_summary_table(diff_data, ai_explanations):
 )
 def download_compared_images_as_pdf(n_clicks, compared_images):
     if n_clicks > 0 and compared_images:
+        images1 = compared_images.get('images1', [])
+        images2 = compared_images.get('images2', [])
         combined_images = []
-
-        # Process images in pairs (side-by-side layout)
-        for i in range(0, len(compared_images), 2):
-            try:
-                img1 = None
-                img2 = None
-
-                # Decode first image in the pair
-                if i < len(compared_images):
-                    img1_data = base64.b64decode(compared_images[i])
-                    img1 = Image.open(io.BytesIO(img1_data))
-
-                # Decode second image in the pair
-                if i + 1 < len(compared_images):
-                    img2_data = base64.b64decode(compared_images[i + 1])
-                    img2 = Image.open(io.BytesIO(img2_data))
-
-                # Ensure both images are in RGB mode
-                if img1 and img1.mode != 'RGB':
-                    img1 = img1.convert('RGB')
-                if img2 and img2.mode != 'RGB':
-                    img2 = img2.convert('RGB')
-
-                # Determine the size of the combined image
-                if img1 and img2:
-                    total_width = img1.width + img2.width
+        for img1_base64, img2_base64 in zip(images1, images2):
+            if img1_base64 and img2_base64:
+                try:
+                    img1_data = base64.b64decode(img1_base64)
+                    img1 = Image.open(io.BytesIO(img1_data)).convert('RGB')
+                    img2_data = base64.b64decode(img2_base64)
+                    img2 = Image.open(io.BytesIO(img2_data)).convert('RGB')
+                    # Resize images to have the same height
                     max_height = max(img1.height, img2.height)
-                elif img1:
-                    total_width = img1.width
-                    max_height = img1.height
-                elif img2:
-                    total_width = img2.width
-                    max_height = img2.height
-                else:
+                    if img1.height != max_height:
+                        img1 = img1.resize((int(img1.width * max_height / img1.height), max_height))
+                    if img2.height != max_height:
+                        img2 = img2.resize((int(img2.width * max_height / img2.height), max_height))
+                    # Combine images side by side
+                    combined_width = img1.width + img2.width
+                    combined_height = max_height
+                    combined_image = Image.new('RGB', (combined_width, combined_height))
+                    combined_image.paste(img1, (0, 0))
+                    combined_image.paste(img2, (img1.width, 0))
+                    combined_images.append(combined_image)
+                except Exception as e:
+                    print(f"Error processing images for PDF: {e}")
                     continue
-
-                # Create a new blank image with the combined size
-                combined_img = Image.new("RGB", (total_width, max_height), "white")
-
-                # Paste the images side by side
-                if img1:
-                    combined_img.paste(img1, (0, 0))
-                if img2:
-                    combined_img.paste(img2, (img1.width if img1 else 0, 0))
-
-                # Add to the list of combined images
-                combined_images.append(combined_img)
-
-            except Exception as e:
-                print(f"Error processing image pair {i}-{i + 1}: {e}")
-                continue
-
         if combined_images:
             # Save combined images into a single PDF
             pdf_buffer = BytesIO()
@@ -952,9 +898,8 @@ def download_compared_images_as_pdf(n_clicks, compared_images):
             pdf_bytes = pdf_buffer.getvalue()
             pdf_buffer.close()
 
-            return dcc.send_bytes(pdf_bytes, "compared_images_side_by_side.pdf")
+            return dcc.send_bytes(pdf_bytes, "compared_images.pdf")
     return dash.no_update
 
-
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
